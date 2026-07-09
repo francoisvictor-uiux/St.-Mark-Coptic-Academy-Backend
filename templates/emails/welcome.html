@@ -1,0 +1,29 @@
+{% extends "emails/_base.html" %}
+
+{% block title %}أهلًا بك في الأكاديمية{% endblock %}
+{% block preheader %}تم تفعيل حسابك بنجاح — أهلًا بك في أكاديمية القديس مارمرقس{% endblock %}
+
+{% block content_ar %}
+  <h1 style="margin:0 0 16px;font-size:22px;font-weight:bold;color:#562823;">أهلًا بك يا {{ first_name }} 🎉</h1>
+  <p style="margin:0 0 12px;">تم تفعيل حسابك في أكاديمية القديس مارمرقس القبطية بنجاح، وأصبحت الآن جزءًا من مجتمعها العلمي.</p>
+  <p style="margin:0 0 8px;">ماذا بعد؟</p>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 8px;">
+    <tr><td style="padding:6px 0;font-size:15px;color:#24110f;">✢&nbsp;&nbsp;أكمل ملفك الشخصي لتسهيل إجراءات القبول</td></tr>
+    <tr><td style="padding:6px 0;font-size:15px;color:#24110f;">✢&nbsp;&nbsp;تصفّح البرامج الدراسية واختر ما يناسبك</td></tr>
+    <tr><td style="padding:6px 0;font-size:15px;color:#24110f;">✢&nbsp;&nbsp;تابع الفعاليات والمحاضرات القادمة</td></tr>
+  </table>
+
+  <!-- CTA -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:24px auto 0;">
+    <tr>
+      <td style="background-color:#562823;border-radius:999px;text-align:center;">
+        <a href="{{ login_url }}" style="display:inline-block;padding:14px 40px;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:bold;color:#fef6f0;text-decoration:none;">الدخول إلى البوابة</a>
+      </td>
+    </tr>
+  </table>
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;">Hello {{ first_name }} — your St. Mark Coptic Academy account is now active.
+    <a href="{{ login_url }}" style="color:#1c4a63;font-weight:bold;">Sign in</a> to complete your profile and explore the programs.</p>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "emails/_base.html" %}
+
+{% block title %}رمز استعادة كلمة المرور{% endblock %}
+{% block preheader %}رمز الاستعادة: {{ code }} — صالح لمدة {{ ttl_minutes }} دقائق{% endblock %}
+
+{% block content_ar %}
+  <h1 style="margin:0 0 16px;font-size:22px;font-weight:bold;color:#562823;">أهلًا {{ first_name }}،</h1>
+  <p style="margin:0 0 20px;">تلقينا طلبًا لاستعادة كلمة المرور الخاصة بحسابك. رمز الاستعادة هو:</p>
+
+  <!-- OTP box -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td align="center" style="background-color:#feebde;border:1px solid #e6cdbb;border-radius:14px;padding:20px 16px;">
+        <div dir="ltr" style="font-family:Georgia,'Courier New',monospace;font-size:36px;font-weight:bold;letter-spacing:12px;color:#24110f;">{{ code }}</div>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:20px 0 0;font-size:14px;color:#78534f;">
+    الرمز صالح لمدة <strong style="color:#562823;">{{ ttl_minutes }} دقائق</strong> ويُستخدم مرة واحدة فقط.
+  </p>
+
+  <!-- safety note -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:20px;">
+    <tr>
+      <td style="background-color:#fcf1f1;border-right:3px solid #dd6e6e;border-radius:10px;padding:14px 18px;font-size:14px;line-height:1.8;color:#5d2e2e;">
+        إن لم تطلب استعادة كلمة المرور فتجاهل هذه الرسالة — حسابك آمن ولن يتغير شيء.
+      </td>
+    </tr>
+  </table>
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;">Hello {{ first_name }}, your password reset code is
+    <strong dir="ltr" style="color:#562823;letter-spacing:2px;">{{ code }}</strong>
+    (valid {{ ttl_minutes }} minutes, single-use). If you didn't request a reset, ignore this email — your account is safe.</p>
+{% endblock %}

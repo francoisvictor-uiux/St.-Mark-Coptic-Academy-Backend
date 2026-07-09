@@ -1,0 +1,80 @@
+{# Brand email shell — CSS-only (no remote images), table-based, inline styles.
+   Palette: creamy #fef6f0/#fffcfa/#feebde · brown #562823/#78534f/#24110f ·
+   red #dd6e6e · blue #1c4a63 · line #cbbcbb  (src/app/globals.css)
+   Blocks: preheader · content_ar (RTL primary) · content_en (LTR secondary) · footer_extra #}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}أكاديمية القديس مارمرقس القبطية{% endblock %}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#fef6f0;-webkit-text-size-adjust:100%;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{% block preheader %}{% endblock %}</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fef6f0;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:100%;max-width:600px;">
+
+          <!-- ═ Header band ═ -->
+          <tr>
+            <td style="background-color:#562823;border-radius:20px 20px 0 0;padding:32px 24px 24px;text-align:center;">
+              <!-- logo mark (text-rendered; swap for hosted PNG later via logo_url) -->
+              {% if logo_url %}
+              <img src="{{ logo_url }}" width="56" height="56" alt="✚" style="display:block;margin:0 auto;border-radius:999px;">
+              {% else %}
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+                <tr>
+                  <td width="56" height="56" align="center" valign="middle"
+                      style="background-color:#dd6e6e;border-radius:999px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:56px;color:#fef6f0;">✚</td>
+                </tr>
+              </table>
+              {% endif %}
+              <div style="padding-top:14px;font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:bold;color:#fef6f0;">أكاديمية القديس مارمرقس القبطية</div>
+              <div style="padding-top:4px;font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:3px;color:#b4a092;">ST. MARK COPTIC ACADEMY</div>
+              <!-- pattern strip (typographic echo of Pattern.svg) -->
+              <div aria-hidden="true" style="padding-top:16px;font-size:11px;letter-spacing:14px;color:#8e6f6c;">✢&nbsp;✦&nbsp;✢&nbsp;✦&nbsp;✢</div>
+            </td>
+          </tr>
+
+          <!-- ceremonial red accent -->
+          <tr>
+            <td height="4" style="background-color:#dd6e6e;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- ═ Body card ═ -->
+          <tr>
+            <td style="background-color:#fffcfa;border:1px solid #cbbcbb;border-top:0;padding:36px 32px;">
+              <div dir="rtl" style="text-align:right;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.9;color:#24110f;">
+                {% block content_ar %}{% endblock %}
+              </div>
+              <div style="border-top:1px solid #e6cdbb;margin:28px 0;font-size:0;line-height:0;">&nbsp;</div>
+              <div dir="ltr" style="text-align:left;font-family:Georgia,'Times New Roman',serif;font-size:14px;line-height:1.7;color:#78534f;">
+                {% block content_en %}{% endblock %}
+              </div>
+            </td>
+          </tr>
+
+          <!-- ═ Footer ═ -->
+          <tr>
+            <td style="background-color:#feebde;border:1px solid #cbbcbb;border-top:0;border-radius:0 0 20px 20px;padding:22px 24px;text-align:center;">
+              <div aria-hidden="true" style="font-size:10px;letter-spacing:10px;color:#b4a092;padding-bottom:10px;">✢&nbsp;✦&nbsp;✢</div>
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.8;color:#78534f;">
+                أكاديمية القديس مارمرقس القبطية &nbsp;·&nbsp; St. Mark Coptic Academy
+              </div>
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:12px;line-height:1.8;color:#8b7c71;">
+                هذه رسالة آلية — لا ترد عليها مباشرة &nbsp;·&nbsp; This is an automated message
+              </div>
+              {% block footer_extra %}{% endblock %}
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

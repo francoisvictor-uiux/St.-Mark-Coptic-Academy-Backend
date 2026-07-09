@@ -1,0 +1,22 @@
+{% if issue_label %}{{ issue_label }}
+{% endif %}{{ hero_title }}
+
+{{ hero_text }}
+{% if hero_cta_url %}
+{{ hero_cta_label }}: {{ hero_cta_url }}
+{% endif %}{% if articles %}
+— من مقالات الأكاديمية —
+{% for article in articles %}
+* {{ article.title }}
+  {{ article.excerpt }}
+  {{ article.url }}
+{% endfor %}{% endif %}{% if events %}
+— فعاليات قادمة —
+{% for event in events %}
+* {{ event.date_label }} — {{ event.title }} ({{ event.location }})
+{% endfor %}{% endif %}{% if closing_text %}
+{{ closing_text }}
+{% endif %}
+---
+أكاديمية القديس مارمرقس القبطية · St. Mark Coptic Academy
+{% if unsubscribe_url %}إلغاء الاشتراك · Unsubscribe: {{ unsubscribe_url }}{% endif %}

@@ -1,0 +1,92 @@
+{% extends "emails/_base.html" %}
+{# Full-digest newsletter. All sections optional — drive with context:
+   issue_label · hero_title · hero_text · hero_cta_label · hero_cta_url ·
+   articles [{title, excerpt, url}] · events [{date_label, title, location}] ·
+   closing_text · unsubscribe_url #}
+
+{% block title %}{{ hero_title }}{% endblock %}
+{% block preheader %}{{ hero_text|truncatechars:120 }}{% endblock %}
+
+{% block content_ar %}
+  {% if issue_label %}
+  <div style="text-align:center;margin:0 0 20px;">
+    <span style="display:inline-block;background-color:#fcf1f1;border-radius:999px;padding:6px 18px;font-size:12px;font-weight:bold;letter-spacing:1px;color:#7a3d3d;">{{ issue_label }}</span>
+  </div>
+  {% endif %}
+
+  <!-- ═ Hero ═ -->
+  <h1 style="margin:0 0 14px;font-size:26px;line-height:1.5;font-weight:bold;color:#562823;text-align:center;">{{ hero_title }}</h1>
+  <p style="margin:0 0 8px;text-align:center;color:#24110f;">{{ hero_text }}</p>
+
+  {% if hero_cta_url %}
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:22px auto 6px;">
+    <tr>
+      <td style="background-color:#562823;border-radius:999px;text-align:center;">
+        <a href="{{ hero_cta_url }}" style="display:inline-block;padding:13px 38px;font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:bold;color:#fef6f0;text-decoration:none;">{{ hero_cta_label }}</a>
+      </td>
+    </tr>
+  </table>
+  {% endif %}
+
+  {% if articles %}
+  <!-- ═ Articles ═ -->
+  <div style="margin:32px 0 14px;text-align:center;">
+    <span aria-hidden="true" style="font-size:11px;letter-spacing:8px;color:#b4a092;">✢&nbsp;✦&nbsp;✢</span>
+    <div style="font-size:19px;font-weight:bold;color:#562823;padding-top:6px;">من مقالات الأكاديمية</div>
+  </div>
+  {% for article in articles %}
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 12px;">
+    <tr>
+      <td style="background-color:#fef6f0;border:1px solid #e6cdbb;border-radius:14px;padding:18px 20px;">
+        <div style="font-size:17px;font-weight:bold;color:#562823;line-height:1.6;">{{ article.title }}</div>
+        <div style="font-size:14px;color:#78534f;line-height:1.8;padding:6px 0 10px;">{{ article.excerpt }}</div>
+        <a href="{{ article.url }}" style="font-size:14px;font-weight:bold;color:#1c4a63;text-decoration:none;">اقرأ المقال كاملًا ←</a>
+      </td>
+    </tr>
+  </table>
+  {% endfor %}
+  {% endif %}
+
+  {% if events %}
+  <!-- ═ Events ═ -->
+  <div style="margin:32px 0 14px;text-align:center;">
+    <span aria-hidden="true" style="font-size:11px;letter-spacing:8px;color:#b4a092;">✢&nbsp;✦&nbsp;✢</span>
+    <div style="font-size:19px;font-weight:bold;color:#562823;padding-top:6px;">فعاليات قادمة</div>
+  </div>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border:1px solid #e6cdbb;border-radius:14px;background-color:#fffcfa;">
+    {% for event in events %}
+    <tr>
+      <td style="padding:14px 18px;{% if not forloop.last %}border-bottom:1px solid #feebde;{% endif %}">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td width="86" valign="top" style="padding-left:14px;">
+              <div style="background-color:#fcf1f1;border-radius:10px;padding:8px 6px;text-align:center;font-size:12px;font-weight:bold;color:#7a3d3d;line-height:1.5;">{{ event.date_label }}</div>
+            </td>
+            <td valign="middle">
+              <div style="font-size:15px;font-weight:bold;color:#24110f;line-height:1.6;">{{ event.title }}</div>
+              <div style="font-size:13px;color:#8b7c71;">{{ event.location }}</div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+  {% if closing_text %}
+  <p style="margin:28px 0 0;text-align:center;font-size:15px;color:#78534f;">{{ closing_text }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;text-align:center;">You are receiving the St. Mark Coptic Academy newsletter.</p>
+{% endblock %}
+
+{% block footer_extra %}
+  {% if unsubscribe_url %}
+  <div style="padding-top:10px;font-family:Georgia,'Times New Roman',serif;font-size:12px;">
+    <a href="{{ unsubscribe_url }}" style="color:#1c4a63;">إلغاء الاشتراك في النشرة · Unsubscribe</a>
+  </div>
+  {% endif %}
+{% endblock %}

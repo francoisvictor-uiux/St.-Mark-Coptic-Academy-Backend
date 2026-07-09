@@ -1,0 +1,29 @@
+{% extends "emails/_base.html" %}
+
+{% block title %}رمز تفعيل حسابك{% endblock %}
+{% block preheader %}رمز التفعيل: {{ code }} — صالح لمدة {{ ttl_minutes }} دقيقة{% endblock %}
+
+{% block content_ar %}
+  <h1 style="margin:0 0 16px;font-size:22px;font-weight:bold;color:#562823;">أهلًا {{ first_name }}،</h1>
+  <p style="margin:0 0 20px;">خطوة واحدة تفصلك عن الانضمام إلى مجتمع الأكاديمية. رمز تفعيل حسابك هو:</p>
+
+  <!-- OTP box -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td align="center" style="background-color:#feebde;border:1px solid #e6cdbb;border-radius:14px;padding:20px 16px;">
+        <div dir="ltr" style="font-family:Georgia,'Courier New',monospace;font-size:36px;font-weight:bold;letter-spacing:12px;color:#24110f;">{{ code }}</div>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:20px 0 0;font-size:14px;color:#78534f;">
+    الرمز صالح لمدة <strong style="color:#562823;">{{ ttl_minutes }} دقيقة</strong> ويُستخدم مرة واحدة فقط.
+    إن لم تطلب هذا الرمز فتجاهل هذه الرسالة — لن يتم إنشاء أي حساب.
+  </p>
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;">Hello {{ first_name }}, your St. Mark Coptic Academy verification code is
+    <strong dir="ltr" style="color:#562823;letter-spacing:2px;">{{ code }}</strong>.
+    It is valid for {{ ttl_minutes }} minutes and can be used once. If you didn't request it, simply ignore this email.</p>
+{% endblock %}

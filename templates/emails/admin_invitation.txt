@@ -1,0 +1,17 @@
+أهلًا {{ first_name }}،
+
+دعاك {{ inviter_name }} للانضمام إلى فريق إدارة أكاديمية القديس مارمرقس القبطية بدور {{ role_name }}.
+
+لقبول الدعوة وتعيين كلمة المرور: {{ invite_url }}
+
+الرابط صالح لمدة {{ expires_hours }} ساعة. إن لم تكن تتوقع هذه الدعوة فتجاهل الرسالة.
+
+---
+
+Hello {{ first_name }},
+
+{{ inviter_name }} invited you to join the St. Mark Coptic Academy team as {{ role_name }}.
+
+Accept and set your password: {{ invite_url }}
+
+The link is valid for {{ expires_hours }} hours. If you did not expect this invitation, ignore this email.

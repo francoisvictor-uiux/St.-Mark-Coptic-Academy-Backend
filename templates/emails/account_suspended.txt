@@ -1,0 +1,13 @@
+أهلًا {{ first_name }}،
+
+نحيطك علمًا بأنه تم تعليق حسابك في أكاديمية القديس مارمرقس القبطية مؤقتًا من قبل الإدارة. لن تتمكن من تسجيل الدخول خلال فترة التعليق.
+
+إن كان لديك أي استفسار تواصل مع إدارة الأكاديمية.
+
+---
+
+Hello {{ first_name }},
+
+Your St. Mark Coptic Academy account has been temporarily suspended by the administration. You won't be able to sign in during this period.
+
+If you believe this is a mistake, please contact the Academy office.

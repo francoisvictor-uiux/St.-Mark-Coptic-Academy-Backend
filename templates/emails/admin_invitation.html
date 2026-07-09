@@ -1,0 +1,30 @@
+{% extends "emails/_base.html" %}
+
+{% block title %}دعوة للانضمام لفريق الأكاديمية{% endblock %}
+{% block preheader %}دعاك {{ inviter_name }} للانضمام إلى فريق إدارة الأكاديمية{% endblock %}
+
+{% block content_ar %}
+  <h1 style="margin:0 0 16px;font-size:22px;font-weight:bold;color:#562823;">أهلًا {{ first_name }}،</h1>
+  <p style="margin:0 0 12px;">دعاك <strong>{{ inviter_name }}</strong> للانضمام إلى فريق إدارة أكاديمية القديس مارمرقس القبطية بدور <strong style="color:#562823;">{{ role_name }}</strong>.</p>
+  <p style="margin:0 0 20px;">لقبول الدعوة وتعيين كلمة المرور الخاصة بك:</p>
+
+  <!-- CTA -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+    <tr>
+      <td style="background-color:#562823;border-radius:999px;text-align:center;">
+        <a href="{{ invite_url }}" style="display:inline-block;padding:14px 40px;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:bold;color:#fef6f0;text-decoration:none;">قبول الدعوة</a>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:20px 0 0;font-size:14px;color:#78534f;">
+    الرابط صالح لمدة <strong style="color:#562823;">{{ expires_hours }} ساعة</strong>.
+    إن لم تكن تتوقع هذه الدعوة فتجاهل الرسالة.
+  </p>
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;">Hello {{ first_name }} — {{ inviter_name }} invited you to join the St. Mark Coptic Academy team as
+    <strong>{{ role_name }}</strong>. <a href="{{ invite_url }}" style="color:#1c4a63;font-weight:bold;">Accept the invitation</a>
+    to set your password (link valid {{ expires_hours }} hours).</p>
+{% endblock %}

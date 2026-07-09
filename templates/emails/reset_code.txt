@@ -1,0 +1,13 @@
+أهلاً {{ first_name }}،
+
+رمز استعادة كلمة المرور الخاص بك هو: {{ code }}
+
+الرمز صالح لمدة {{ ttl_minutes }} دقائق. إن لم تطلب استعادة كلمة المرور فتجاهل هذه الرسالة — حسابك آمن.
+
+---
+
+Hello {{ first_name }},
+
+Your password reset code is: {{ code }}
+
+The code is valid for {{ ttl_minutes }} minutes. If you did not request a reset, ignore this email — your account is safe.

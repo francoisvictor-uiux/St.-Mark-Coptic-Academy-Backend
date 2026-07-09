@@ -1,0 +1,15 @@
+{% extends "emails/_base.html" %}
+
+{% block title %}بخصوص حسابك في الأكاديمية{% endblock %}
+{% block preheader %}تحديث مهم بخصوص حالة حسابك في أكاديمية القديس مارمرقس{% endblock %}
+
+{% block content_ar %}
+  <h1 style="margin:0 0 16px;font-size:22px;font-weight:bold;color:#562823;">أهلًا {{ first_name }}،</h1>
+  <p style="margin:0 0 12px;">نحيطك علمًا بأنه تم <strong>تعليق حسابك</strong> في أكاديمية القديس مارمرقس القبطية مؤقتًا من قبل الإدارة.</p>
+  <p style="margin:0 0 12px;">لن تتمكن من تسجيل الدخول خلال فترة التعليق. إن كان لديك أي استفسار أو كنت ترى أن ذلك تم عن طريق الخطأ، تواصل مع إدارة الأكاديمية وسيسعدنا مساعدتك.</p>
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;">Hello {{ first_name }} — your St. Mark Coptic Academy account has been temporarily suspended by the administration.
+    You won't be able to sign in during this period. If you believe this is a mistake, please contact the Academy office.</p>
+{% endblock %}

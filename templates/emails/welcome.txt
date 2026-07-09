@@ -1,0 +1,13 @@
+أهلاً {{ first_name }}،
+
+تم تفعيل حسابك في أكاديمية القديس مارمرقس بنجاح. يمكنك الآن تسجيل الدخول واستكمال ملفك الشخصي.
+
+{{ login_url }}
+
+---
+
+Hello {{ first_name }},
+
+Your St. Mark Coptic Academy account is now active. You can sign in and complete your profile.
+
+{{ login_url }}
