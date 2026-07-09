@@ -1,11 +1,12 @@
-Django>=6.0,<7.0
+Django>=5.2,<5.3
 djangorestframework>=3.17
 djangorestframework-simplejwt>=5.5
 drf-spectacular>=0.30
 django-axes>=8.3
 django-cors-headers>=4.9
 django-environ>=0.14
+whitenoise>=6.8
 argon2-cffi>=25.1
-psycopg[binary]>=3.3
+PyMySQL>=1.1
 Pillow>=11.0
 nh3>=0.2

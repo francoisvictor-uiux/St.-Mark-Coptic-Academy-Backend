@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -73,6 +74,12 @@ DATABASES = {
         default="postgres://postgres:postgres@127.0.0.1:5432/stmark",
     )
 }
+
+# The host runs PostgreSQL 10.x, which Django 5.2 refuses by default. Route
+# PostgreSQL connections through our custom backend that lowers the minimum
+# version check. Has no effect on SQLite or other engines.
+if DATABASES["default"].get("ENGINE") == "django.db.backends.postgresql":
+    DATABASES["default"]["ENGINE"] = "config.db_backends.postgresql_legacy"
 
 AUTH_USER_MODEL = "accounts.User"
 

@@ -33,3 +33,12 @@ CSRF_TRUSTED_ORIGINS = env.list(
 
 # Persistent DB connections
 DATABASES["default"]["CONN_MAX_AGE"] = 60  # noqa: F405
+
+# WhiteNoise serves the admin + Swagger static assets straight from the app,
+# so no web-server alias is needed. collectstatic must run on each deploy.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
