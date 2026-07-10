@@ -9,8 +9,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Article, Event, PublishStatus
-from .serializers import ArticleDetailSerializer, ArticleListSerializer, EventSerializer
+from .models import Article, Event, PublishStatus, Thesis
+from .serializers import (
+    ArticleDetailSerializer,
+    ArticleListSerializer,
+    EventSerializer,
+    ThesisSerializer,
+)
 
 
 class PublicCursorPagination(CursorPagination):
@@ -195,6 +200,102 @@ class PublicArticleDetailView(RetrieveAPIView):
         Article.objects.filter(pk=instance.pk).update(views=F("views") + 1)
         instance.views += 1
         return Response(self.get_serializer(instance).data)
+
+
+THESIS_SORT_MAP = {
+    "newest": ("-year", "-created_at"),
+    "oldest": ("year", "created_at"),
+    "updated": ("-updated_at",),
+    "alphabetical": ("title_ar",),
+}
+
+
+def _published_theses():
+    return Thesis.objects.filter(is_published=True).select_related("category")
+
+
+def _apply_thesis_filters(qs, params):
+    from django.db.models import Q
+
+    if q := params.get("q"):
+        qs = qs.filter(
+            Q(title_ar__icontains=q) | Q(title_en__icontains=q)
+            | Q(researcher_ar__icontains=q) | Q(researcher_en__icontains=q)
+            | Q(institution_ar__icontains=q) | Q(institution_en__icontains=q)
+            | Q(abstract_ar__icontains=q) | Q(abstract_en__icontains=q)
+        )
+    if category := params.get("category"):
+        qs = qs.filter(category__slug=category)
+    if degree := params.get("degree"):
+        qs = qs.filter(degree=degree)
+    if year := params.get("year"):
+        if year.isdigit():
+            qs = qs.filter(year=int(year))
+    if keyword := params.get("keyword"):
+        qs = qs.filter(keywords__contains=[keyword])
+    return qs
+
+
+class PublicThesesView(APIView):
+    """Faceted, page-numbered thesis library — the مكتبة الرسائل page.
+
+    Returns {results, page, pages, total, facets}. Facets (categories, degrees,
+    years, keywords) are computed over the whole published corpus for stable
+    filter figures."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        params = request.query_params
+        base = _published_theses()
+        filtered = _apply_thesis_filters(base, params)
+
+        sort = THESIS_SORT_MAP.get(params.get("sort", "newest"), ("-year", "-created_at"))
+        filtered = filtered.order_by(*sort)
+
+        page = max(1, int(params.get("page", 1) or 1))
+        size = min(24, max(1, int(params.get("page_size", 9) or 9)))
+        total = filtered.count()
+        pages = max(1, (total + size - 1) // size)
+        start = (page - 1) * size
+        window = filtered[start:start + size]
+
+        return Response({
+            "results": ThesisSerializer(window, many=True).data,
+            "page": page,
+            "pages": pages,
+            "total": total,
+            "facets": self._facets(base),
+        })
+
+    def _facets(self, base):
+        cats = (
+            base.exclude(category__isnull=True)
+            .values("category__slug", "category__name_ar", "category__name_en")
+            .annotate(count=Count("id"))
+            .order_by("-count")
+        )
+        degrees = (
+            base.values("degree").annotate(count=Count("id")).order_by("-count")
+        )
+        years = sorted({y for y in base.values_list("year", flat=True) if y}, reverse=True)
+        kw_counter = Counter()
+        for kws in base.values_list("keywords", flat=True):
+            for k in kws or []:
+                kw_counter[k] += 1
+
+        return {
+            "total_theses": base.count(),
+            "categories": [
+                {"slug": c["category__slug"], "name_ar": c["category__name_ar"],
+                 "name_en": c["category__name_en"], "count": c["count"]}
+                for c in cats
+            ],
+            "degrees": [{"degree": d["degree"], "count": d["count"]} for d in degrees],
+            "years": years,
+            "keywords": [{"keyword": k, "count": n} for k, n in kw_counter.most_common(20)],
+        }
 
 
 class PublicEventsView(ListAPIView):

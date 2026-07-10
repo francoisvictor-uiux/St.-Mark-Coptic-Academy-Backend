@@ -6,6 +6,7 @@ urlpatterns = [
     path("articles", views.PublicArticlesView.as_view(), name="public-articles"),
     path("articles/featured", views.PublicFeaturedArticlesView.as_view(), name="public-articles-featured"),
     path("articles/<slug:slug>", views.PublicArticleDetailView.as_view(), name="public-article"),
+    path("theses", views.PublicThesesView.as_view(), name="public-theses"),
     path("events", views.PublicEventsView.as_view(), name="public-events"),
     path("news", views.PublicNewsView.as_view(), name="public-news"),
     path("news/<slug:slug>", views.PublicNewsDetailView.as_view(), name="public-news-detail"),

@@ -222,7 +222,11 @@ class ThesisDegree(models.TextChoices):
 
 
 class Thesis(TimeStampedModel):
-    """Library entry (homepage strip now; full theses library later)."""
+    """A thesis/dissertation in the مكتبة الرسائل library.
+
+    Homepage strip + full searchable library page (/theses). Categorised,
+    keyword-tagged, with an optional link to the full-text PDF.
+    """
 
     title_ar = models.CharField(max_length=300)
     title_en = models.CharField(max_length=300, blank=True, default="")
@@ -232,6 +236,13 @@ class Thesis(TimeStampedModel):
     institution_ar = models.CharField(max_length=200, blank=True, default="")
     institution_en = models.CharField(max_length=200, blank=True, default="")
     year = models.PositiveSmallIntegerField()
+    category = models.ForeignKey(
+        Category, null=True, blank=True, on_delete=models.SET_NULL, related_name="theses"
+    )
+    abstract_ar = models.TextField(blank=True, default="")
+    abstract_en = models.TextField(blank=True, default="")
+    keywords = models.JSONField(default=list, blank=True)  # list of free-text strings
+    file_url = models.URLField(blank=True, default="")  # link to full-text PDF
     sort_order = models.PositiveSmallIntegerField(default=0)
     is_published = models.BooleanField(default=False)
 
@@ -239,6 +250,7 @@ class Thesis(TimeStampedModel):
         db_table = "theses"
         ordering = ["sort_order", "-year"]
         verbose_name_plural = "theses"
+        indexes = [models.Index(fields=["is_published", "-year"], name="theses_pub_year_idx")]
 
     def __str__(self):
         return self.title_ar[:60]

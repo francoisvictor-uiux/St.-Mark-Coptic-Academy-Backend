@@ -258,11 +258,29 @@ class GalleryItemSerializer(serializers.ModelSerializer):
 
 
 class ThesisSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        source="category", queryset=Category.objects.filter(is_active=True),
+        required=False, allow_null=True, write_only=True,
+    )
+
     class Meta:
         model = Thesis
         fields = [
             "id", "title_ar", "title_en", "researcher_ar", "researcher_en",
             "degree", "institution_ar", "institution_en", "year",
+            "category", "category_id", "abstract_ar", "abstract_en",
+            "keywords", "file_url",
             "sort_order", "is_published", "created_at",
         ]
         read_only_fields = ["sort_order"]
+
+    def validate_keywords(self, value):
+        # De-dupe, trim, cap at 10 keywords.
+        seen, out = set(), []
+        for kw in value or []:
+            k = str(kw).strip()
+            if k and k.lower() not in seen:
+                seen.add(k.lower())
+                out.append(k)
+        return out[:10]

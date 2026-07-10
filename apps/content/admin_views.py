@@ -601,6 +601,13 @@ HOMEPAGE_TEXT_SCHEMA = {
 MAX_STATS = 6
 MAX_FEATURES = 6
 
+# Homepage sections that admins can show/hide, in page render order.
+# Absent/unknown → treated as visible (True) by the frontend and here.
+HOMEPAGE_SECTION_KEYS = [
+    "hero", "partners", "vision", "stats", "programs", "theses", "features",
+    "articles", "testimonials", "gallery", "events", "apply", "faq",
+]
+
 
 def _clean_homepage(payload):
     if not isinstance(payload, dict):
@@ -611,6 +618,14 @@ def _clean_homepage(payload):
         if not isinstance(source, dict):
             source = {}
         cleaned[section] = {k: str(source.get(k, "") or "")[:2000] for k in keys}
+
+    visibility_source = payload.get("visibility")
+    if not isinstance(visibility_source, dict):
+        visibility_source = {}
+    # Default every section to visible; only an explicit False hides it.
+    cleaned["visibility"] = {
+        k: bool(visibility_source.get(k, True)) for k in HOMEPAGE_SECTION_KEYS
+    }
     def to_int(raw):
         try:
             return int(raw)
