@@ -1,0 +1,6 @@
+# Deploy files must keep LF line endings — they run on the Linux cPanel server.
+# A CRLF shebang (#!/bin/bash\r) would fail with "bad interpreter".
+*.sh   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+.cpanel.yml text eol=lf
