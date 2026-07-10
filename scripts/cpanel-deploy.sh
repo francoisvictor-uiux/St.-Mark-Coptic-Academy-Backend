@@ -16,6 +16,10 @@
 # Safe to run repeatedly; it only acts when origin/main moves.
 set -euo pipefail
 
+# Cron runs with a minimal PATH; make sure git/rsync/python are found regardless
+# of the host layout (cPanel ships git under 3rdparty on some boxes).
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/cpanel/3rdparty/bin:$PATH"
+
 # Resolve the repo root as this script's parent-of-parent, so it works wherever
 # cPanel cloned the repository.
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
