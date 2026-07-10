@@ -1,0 +1,29 @@
+---
+# cPanel Git™ Version Control deployment for the St. Mark Coptic Academy backend.
+#
+# Runs when you click "Deploy HEAD Commit" in cPanel → Git Version Control
+# (and is mirrored by scripts/cpanel-deploy.sh for the cron job). GitHub `main`
+# is the source of truth; this syncs the checked-out code into the LIVE Passenger
+# app root, installs deps, migrates, collects static, and restarts the app.
+#
+# App root (also the api.smcacademy.org document root): /home/smca/api.smcacademy.org
+# Virtualenv:                     /home/smca/virtualenv/api.smcacademy.org/3.11
+#
+# NOTE: We intentionally do NOT use `rsync --delete`. The live app root also holds
+# server-only files that are NOT in git — .env (secrets), media/ (uploads),
+# staticfiles/ (collected assets), tmp/ (restart trigger), and the Passenger-
+# generated .htaccess. An overlay copy updates code without touching those.
+deployment:
+  tasks:
+    - export APPROOT=/home/smca/api.smcacademy.org
+    - export VBIN=/home/smca/virtualenv/api.smcacademy.org/3.11/bin
+    # 1) Sync code into the live app root (overlay; preserve server-only files).
+    - /usr/bin/rsync -a --exclude='.env' --exclude='.git/' --exclude='.htaccess' --exclude='media/' --exclude='staticfiles/' --exclude='tmp/' --exclude='db.sqlite3' --exclude='__pycache__/' --exclude='.venv/' ./ "$APPROOT/"
+    # 2) Install/upgrade Python deps (no-op when requirements.txt is unchanged).
+    - "$VBIN/pip" install -r "$APPROOT/requirements.txt"
+    # 3) Apply DB migrations against the live MySQL database.
+    - cd "$APPROOT" && DJANGO_ENV=prod "$VBIN/python" manage.py migrate --noinput
+    # 4) Collect static assets (admin / Swagger CSS, etc.).
+    - cd "$APPROOT" && DJANGO_ENV=prod "$VBIN/python" manage.py collectstatic --noinput
+    # 5) Restart the Passenger app so the new code is loaded.
+    - /bin/mkdir -p "$APPROOT/tmp" && /bin/touch "$APPROOT/tmp/restart.txt"
