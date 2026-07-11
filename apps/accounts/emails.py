@@ -7,7 +7,7 @@ queue (Celery) before launch per spec §4.
 
 import logging
 
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
@@ -47,12 +47,20 @@ def send_templated(to_email: str, template: str, context: dict, subject: str | N
     Every attempt lands in the email_log table (recipient, template,
     subject, time, sent/failed) — bodies are never stored.
     """
-    final_subject = subject or SUBJECTS[template]
-    text_body = render_to_string(f"emails/{template}.txt", context)
-    html_body = render_to_string(f"emails/{template}.html", context)
-    message = EmailMultiAlternatives(subject=final_subject, body=text_body, to=[to_email])
-    message.attach_alternative(html_body, "text/html")
+    final_subject = subject or SUBJECTS.get(
+        template, "أكاديمية القديس مارمرقس | St. Mark Coptic Academy"
+    )
     try:
+        text_body = render_to_string(f"emails/{template}.txt", context)
+        html_body = render_to_string(f"emails/{template}.html", context)
+        # Bounded connection so a slow or misconfigured mail server can never
+        # hang (or crash) the request that triggered the email. Email is
+        # best-effort — a failure here must never block registration/login.
+        connection = get_connection(timeout=10)
+        message = EmailMultiAlternatives(
+            subject=final_subject, body=text_body, to=[to_email], connection=connection
+        )
+        message.attach_alternative(html_body, "text/html")
         message.send()
         _log_send(to_email, template, final_subject)
         return True
