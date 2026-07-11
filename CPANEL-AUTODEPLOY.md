@@ -1,58 +1,48 @@
-# Backend auto-deploy from GitHub (cPanel Git™ Version Control)
+# Backend auto-deploy from GitHub (cPanel, no SSH)
 
 The GitHub repo `St.-Mark-Coptic-Academy-Backend` (`main`) is the source of truth.
-This host has **no SSH/webhook**, so there is no instant push-to-live. Instead we use
-cPanel **Git Version Control** (clones the repo without shell) + `.cpanel.yml`, in two
-modes that are already wired in the repo:
+This host has **no SSH/webhook and no working server shell**, so there is no instant
+push-to-live. A **cron job** gives near-automatic deploys (live within ~5 min of a push).
 
-- **One-click:** cPanel → Git Version Control → *Update from Remote* → *Deploy HEAD Commit*.
-- **Near-automatic:** a cron job (`scripts/cpanel-deploy.sh`) pulls & deploys every ~5 min.
+> **What actually works here:** cPanel's built-in one-click *Deploy HEAD Commit* does
+> **NOT** run on this account — it needs a server shell (disabled), so it queues but never
+> executes and leaves an empty deploy log. The **cron job below is the real mechanism.**
+> cPanel **Git Version Control** is only used once, to place the clone on the server; after
+> that you can even remove it from the Git UI — the deploy works off the on-disk folder.
 
-Both run the same steps: sync code into the live app root, `pip install`, `migrate`,
-`collectstatic`, restart Passenger. App root: `/home/smca/api.smcacademy.org`.
-
-> Prerequisite: cPanel must show **Git Version Control** (it's how the clone is created
-> without SSH). If it's missing, ask the host to enable it — the cron mode needs the clone too.
+The cron runs `scripts/cpanel-deploy.sh`, which pulls `main` and (only when there are new
+commits) syncs code into the live app root, `pip install`s, `migrate`s, `collectstatic`s,
+and restarts Passenger. App root: `/home/smca/api.smcacademy.org`.
 
 ---
 
-## 1. Create the repository in cPanel (one time)
+## 1. Put a clone on the server (one time)
 
-cPanel → **Git™ Version Control** → **Create**:
-- **Clone a Repository:** toggle **ON**.
+cPanel → **Git™ Version Control** → **Create** → *Clone a Repository*:
 - **Clone URL:** `https://github.com/francoisvictor-uiux/St.-Mark-Coptic-Academy-Backend.git`
   (public repo — no credentials needed).
-- **Repository Path:** `/home/smca/repositories/backend`  ← remember this; the cron uses it.
-- **Repository Name:** `backend`.
-- **Create.** cPanel clones `main`.
+- Let cPanel choose the path. It derives it from the repo name:
+  **`/home/smca/repositories/St.-Mark-Coptic-Academy-Backend`** ← this exact path is what the cron uses.
+- **Create.** cPanel clones `main` (folder includes `.git`, so the cron can pull).
 
-## 2. First deploy (one-click)
+You do **not** need to touch *Update from Remote* / *Deploy HEAD Commit* — the cron pulls itself.
 
-cPanel → Git Version Control → **Manage** (on the `backend` repo) → **Pull or Deploy** tab:
-- **Update from Remote** (pulls latest `main`).
-- **Deploy HEAD Commit** (runs `.cpanel.yml`).
-
-Watch the deploy log, then verify:
-`https://api.smcacademy.org/api/v1/health` → `{"status":"ok","database":"connected"}`
-
-> The very first deploy is essentially a no-op for code (the server already runs this
-> code) plus migrate/collectstatic/restart. Do it at a quiet time and confirm health.
-
-## 3. Turn on the cron (near-automatic)
+## 2. Add the cron job (this is the deploy engine)
 
 cPanel → **Cron Jobs** → Add New Cron Job:
 - **Common Settings:** *Once Per Five Minutes* (`*/5 * * * *`).
-- **Command:**
+- **Command** (exact — note the real repo path and the `/bin/bash` prefix):
   ```
-  /home/smca/repositories/backend/scripts/cpanel-deploy.sh >> /home/smca/deploy-backend.log 2>&1
+  /bin/bash /home/smca/repositories/St.-Mark-Coptic-Academy-Backend/scripts/cpanel-deploy.sh >> /home/smca/deploy-backend.log 2>&1
   ```
-  (match the path to your Repository Path from step 1).
 
-The script exits instantly when `origin/main` hasn't moved, and only does the full
-deploy when there are new commits. Check `/home/smca/deploy-backend.log` for history.
+The script exits instantly when `origin/main` hasn't moved, and does the full deploy only
+when there are new commits. History/log: **`/home/smca/deploy-backend.log`**.
 
-If the log shows `git: command not found`, prefix the cron command with the host's git
-path, e.g. `PATH=/usr/local/cpanel/3rdparty/bin:$PATH` before the script.
+## 3. Verify
+
+After a deploy, `/home/smca/deploy-backend.log` shows `deploying <old> -> <new>` … `deploy
+complete`, and `https://api.smcacademy.org/api/v1/health` → `{"status":"ok","database":"connected"}`.
 
 ---
 
@@ -60,16 +50,18 @@ path, e.g. `PATH=/usr/local/cpanel/3rdparty/bin:$PATH` before the script.
 
 1. Edit code locally on `main`.
 2. `git push origin main`.
-3. Either wait ≤5 min for the cron, **or** click *Update from Remote* → *Deploy* for instant.
+3. Wait ≤5 min — the cron pulls & deploys automatically. No cPanel, no File Manager.
 
-No more File Manager re-uploads. The deploy preserves server-only files that are not in
-git: `.env`, `media/`, `staticfiles/`, `tmp/`, and the Passenger `.htaccess`.
+The deploy preserves server-only files that are not in git: `.env`, `media/`,
+`staticfiles/`, `tmp/`, and the Passenger `.htaccess`.
 
 ## Safety notes
 
 - Deploys run migrations against the **live** DB automatically. Review migrations before
-  pushing. To pause automation, disable the cron job; the one-click button still works.
+  pushing. To pause automation, disable the cron job in cPanel → Cron Jobs.
 - The sync is an **overlay** (no `rsync --delete`) so it never removes uploads/secrets.
   A file deleted from the repo stays on the server until manually removed.
-- If a deploy fails mid-way (e.g. a bad migration), the cron/`.cpanel.yml` stops before
-  the restart; check the log, fix forward, and push again.
+- If a deploy fails mid-way (e.g. a bad migration), the script stops before the restart;
+  check `deploy-backend.log`, fix forward, and push again.
+- The clone folder must keep its `.git` and an `origin` remote pointing at the GitHub repo
+  (a fresh cPanel clone has both). If it's ever lost, re-clone via Git Version Control.
