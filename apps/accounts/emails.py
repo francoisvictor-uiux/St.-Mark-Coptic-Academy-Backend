@@ -19,6 +19,8 @@ SUBJECTS = {
     "password_changed": "تم تغيير كلمة المرور — أكاديمية القديس مارمرقس | Your password was changed",
     "admin_invitation": "دعوة للانضمام لفريق الأكاديمية — أكاديمية القديس مارمرقس | Team invitation",
     "account_suspended": "بخصوص حسابك — أكاديمية القديس مارمرقس | About your account",
+    "registration_received": "استلمنا طلب تسجيلك — أكاديمية القديس مارمرقس | We received your registration",
+    "activation_link": "تم قبول حسابك — فعّل حسابك | Your account is approved — activate it",
 }
 
 

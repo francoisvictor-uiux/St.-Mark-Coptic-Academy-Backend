@@ -32,6 +32,7 @@ from .services import issue_invite_token, revoke_invite
 from .views import _send_reset_email
 
 INVITE_URL_TEMPLATE = "{frontend}/accept-invite?token={token}"
+ACTIVATION_URL_TEMPLATE = "{frontend}/activate?token={token}"
 
 
 def _privilege_error():
@@ -115,6 +116,22 @@ def _send_invite_email(request, target):
     })
     target.invitation_sent_at = timezone.now()
     target.save(update_fields=["invitation_sent_at", "updated_at"])
+
+
+def _send_activation_email(target):
+    """Approve a pending registration: email the user a link to activate."""
+    from django.conf import settings
+
+    from .services import ACTIVATION_MAX_AGE, issue_activation_token
+
+    token = issue_activation_token(target)
+    frontend = settings.FRONTEND_LOGIN_URL.rsplit("/", 1)[0]  # strip /login
+    activation_url = ACTIVATION_URL_TEMPLATE.format(frontend=frontend, token=token)
+    send_templated(target.email, "activation_link", {
+        "first_name": target.first_name_ar,
+        "activation_url": activation_url,
+        "expires_days": ACTIVATION_MAX_AGE // (24 * 3600),
+    })
 
 
 class UserCursorPagination(CursorPagination):
@@ -238,6 +255,12 @@ class AdminUserStatusView(APIView):
             audit(request, "user.deactivated", module="users", target=target,
                   before=before, after={"status": target.status, "sessions_revoked": revoked})
             send_templated(target.email, "account_suspended", {"first_name": target.first_name_ar})
+        elif target.status == UserStatus.PENDING_APPROVAL:
+            # Approving a new registration: email the activation link. The user
+            # activates by clicking it, so the status stays pending until then.
+            _send_activation_email(target)
+            audit(request, "user.approved", module="users", target=target,
+                  before=before, after={"status": target.status, "activation_email": "sent"})
         else:
             target.status = UserStatus.ACTIVE
             target.save(update_fields=["status", "updated_at"])

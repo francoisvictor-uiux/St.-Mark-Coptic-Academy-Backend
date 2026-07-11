@@ -1,0 +1,15 @@
+{% extends "emails/_base.html" %}
+
+{% block title %}استلمنا طلب تسجيلك{% endblock %}
+{% block preheader %}طلب تسجيلك قيد المراجعة والموافقة من إدارة الأكاديمية{% endblock %}
+
+{% block content_ar %}
+  <h1 style="margin:0 0 16px;font-size:22px;font-weight:bold;color:#562823;">أهلًا {{ first_name }}،</h1>
+  <p style="margin:0 0 12px;">شكرًا لتسجيلك في أكاديمية القديس مارمرقس القبطية. لقد استلمنا طلبك بنجاح.</p>
+  <p style="margin:0 0 12px;">حسابك الآن <strong style="color:#562823;">قيد المراجعة والموافقة</strong> من إدارة الأكاديمية. سنرسل إليك رسالة أخرى تحتوي على رابط تفعيل الحساب بمجرد الموافقة عليه.</p>
+  <p style="margin:20px 0 0;font-size:14px;color:#78534f;">لا حاجة لأي إجراء منك الآن — فقط انتظر رسالة التفعيل.</p>
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;">Hello {{ first_name }} — thank you for registering with St. Mark Coptic Academy. We've received your request, and your account is now <strong>awaiting review and approval</strong> by the Academy. Once it's approved, we'll email you an activation link. No action is needed from you right now — just wait for the activation email.</p>
+{% endblock %}

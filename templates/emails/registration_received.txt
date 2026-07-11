@@ -1,0 +1,17 @@
+أهلًا {{ first_name }}،
+
+شكرًا لتسجيلك في أكاديمية القديس مارمرقس القبطية. لقد استلمنا طلبك بنجاح.
+
+حسابك الآن قيد المراجعة والموافقة من إدارة الأكاديمية. سنرسل إليك رسالة أخرى تحتوي على رابط تفعيل الحساب بمجرد الموافقة عليه.
+
+لا حاجة لأي إجراء منك الآن — فقط انتظر رسالة التفعيل.
+
+---
+
+Hello {{ first_name }},
+
+Thank you for registering with St. Mark Coptic Academy. We've received your request.
+
+Your account is now awaiting review and approval by the Academy. Once it's approved, we'll email you an activation link.
+
+No action is needed from you right now — just wait for the activation email.

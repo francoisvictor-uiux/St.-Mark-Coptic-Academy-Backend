@@ -35,7 +35,7 @@ from .serializers import (
     UserSerializer,
     VerifyCodeSerializer,
 )
-from .services import OTP_TTL, issue_otp, verify_invite_token, verify_otp
+from .services import OTP_TTL, issue_otp, verify_activation_token, verify_invite_token, verify_otp
 
 RESET_TOKEN_SALT = "smca.password-reset"
 RESET_TOKEN_MAX_AGE = 15 * 60  # seconds
@@ -107,6 +107,17 @@ class LoginView(APIView):
                         "unverified",
                         "حسابك بحاجة إلى تفعيل — تحقق من بريدك الإلكتروني",
                         "Your account needs verification — check your email",
+                        status.HTTP_403_FORBIDDEN,
+                    )
+                if existing.status == UserStatus.PENDING_APPROVAL:
+                    LoginHistory.objects.create(
+                        user=existing, identifier_entered=identifier,
+                        result=LoginResult.UNVERIFIED, **meta,
+                    )
+                    return _error(
+                        "pending_approval",
+                        "حسابك قيد مراجعة إدارة الأكاديمية. ستصلك رسالة تفعيل بعد الموافقة عليه",
+                        "Your account is awaiting the Academy's approval — you'll get an activation email once it's approved",
                         status.HTTP_403_FORBIDDEN,
                     )
                 if existing.status == UserStatus.SUSPENDED:
@@ -279,6 +290,7 @@ class RegisterView(APIView):
                 full_name_en=data["full_name_en"],
                 phone=data.get("phone") or "",
                 locale=data["locale"],
+                status=UserStatus.PENDING_APPROVAL,
                 terms_version=settings.TERMS_VERSION,
                 terms_accepted_at=timezone.now(),
             )
@@ -291,9 +303,15 @@ class RegisterView(APIView):
                 church_other_text=data.get("church_other_text") or "",
                 program_interest=data.get("program_interest"),
             )
-        _send_verify_email(user)
+        # Admin-approval flow: no OTP. Tell the user their account is pending
+        # review; the activation link is emailed once an admin approves.
+        send_templated(
+            user.email,
+            "registration_received",
+            {"first_name": user.first_name_ar},
+        )
         return Response(
-            {"user_id": str(user.id), "verification": "email_sent"},
+            {"user_id": str(user.id), "status": "pending_approval"},
             status=status.HTTP_201_CREATED,
         )
 
@@ -325,6 +343,37 @@ class VerifyEmailView(APIView):
             {"first_name": user.first_name_ar, "login_url": settings.FRONTEND_LOGIN_URL},
         )
         # Verified users go straight to their dashboard — no second login step.
+        return _login_payload(user)
+
+
+class ActivateAccountView(APIView):
+    """POST /auth/activate {token} — the user clicks the emailed activation link
+    after an admin approves their registration. Activates the account and logs
+    them straight in."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    def post(self, request):
+        token = (request.data.get("token") or "").strip()
+        if not token:
+            raise ApiError(
+                "invalid_activation",
+                "رابط التفعيل غير صالح أو منتهي الصلاحية",
+                "The activation link is invalid or has expired",
+                status_code=status.HTTP_410_GONE,
+            )
+        user = verify_activation_token(token)
+        user.status = UserStatus.ACTIVE
+        user.email_verified_at = timezone.now()
+        user.save(update_fields=["status", "email_verified_at", "updated_at"])
+        send_templated(
+            user.email,
+            "welcome",
+            {"first_name": user.first_name_ar, "login_url": settings.FRONTEND_LOGIN_URL},
+        )
+        # Activated users go straight to their dashboard — no separate login step.
         return _login_payload(user)
 
 

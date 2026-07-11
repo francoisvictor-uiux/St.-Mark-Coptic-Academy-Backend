@@ -1,0 +1,30 @@
+{% extends "emails/_base.html" %}
+
+{% block title %}تم قبول حسابك — فعّل حسابك الآن{% endblock %}
+{% block preheader %}وافقت إدارة الأكاديمية على حسابك — اضغط لتفعيله{% endblock %}
+
+{% block content_ar %}
+  <h1 style="margin:0 0 16px;font-size:22px;font-weight:bold;color:#562823;">أهلًا {{ first_name }}،</h1>
+  <p style="margin:0 0 12px;">يسعدنا إبلاغك بأن إدارة أكاديمية القديس مارمرقس القبطية قد <strong style="color:#562823;">وافقت على حسابك</strong>.</p>
+  <p style="margin:0 0 20px;">لتفعيل حسابك والبدء في استخدامه، اضغط على الزر التالي:</p>
+
+  <!-- CTA -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+    <tr>
+      <td style="background-color:#562823;border-radius:999px;text-align:center;">
+        <a href="{{ activation_url }}" style="display:inline-block;padding:14px 40px;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:bold;color:#fef6f0;text-decoration:none;">تفعيل الحساب</a>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:20px 0 0;font-size:14px;color:#78534f;">
+    الرابط صالح لمدة <strong style="color:#562823;">{{ expires_days }} أيام</strong>.
+    إن لم تكن قد سجّلت في الأكاديمية فتجاهل هذه الرسالة.
+  </p>
+{% endblock %}
+
+{% block content_en %}
+  <p style="margin:0;">Hello {{ first_name }} — good news: St. Mark Coptic Academy has <strong>approved your account</strong>.
+    <a href="{{ activation_url }}" style="color:#1c4a63;font-weight:bold;">Activate your account</a>
+    to start using it (link valid {{ expires_days }} days). If you didn't register, ignore this email.</p>
+{% endblock %}

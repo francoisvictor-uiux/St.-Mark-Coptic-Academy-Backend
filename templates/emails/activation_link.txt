@@ -1,0 +1,17 @@
+أهلًا {{ first_name }}،
+
+يسعدنا إبلاغك بأن إدارة أكاديمية القديس مارمرقس القبطية قد وافقت على حسابك.
+
+لتفعيل حسابك: {{ activation_url }}
+
+الرابط صالح لمدة {{ expires_days }} أيام. إن لم تكن قد سجّلت في الأكاديمية فتجاهل هذه الرسالة.
+
+---
+
+Hello {{ first_name }},
+
+Good news — St. Mark Coptic Academy has approved your account.
+
+Activate your account: {{ activation_url }}
+
+The link is valid for {{ expires_days }} days. If you didn't register, ignore this email.

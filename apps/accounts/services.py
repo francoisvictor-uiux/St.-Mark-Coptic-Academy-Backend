@@ -136,6 +136,50 @@ def revoke_invite(user) -> int:
     ).update(consumed_at=timezone.now())
 
 
+ACTIVATION_SALT = "smca.account-activation"
+ACTIVATION_MAX_AGE = 7 * 24 * 3600  # 7 days
+
+
+def issue_activation_token(user) -> str:
+    """Signed 7-day activation-link token for an admin-approved registration.
+
+    Effectively single-use: verify_activation_token only resolves users still in
+    PENDING_APPROVAL, so once the account is activated the link stops working.
+    """
+    from django.core import signing
+
+    return signing.dumps(
+        {"uid": str(user.id), "n": secrets.token_hex(4)}, salt=ACTIVATION_SALT
+    )
+
+
+def _invalid_activation_error():
+    return ApiError(
+        "invalid_activation",
+        "رابط التفعيل غير صالح أو منتهي الصلاحية",
+        "The activation link is invalid or has expired",
+        status_code=410,
+    )
+
+
+def verify_activation_token(token: str):
+    """Resolve an activation token → the pending-approval user, or raise."""
+    from django.core import signing
+
+    from .models import User, UserStatus
+
+    try:
+        payload = signing.loads(token, salt=ACTIVATION_SALT, max_age=ACTIVATION_MAX_AGE)
+    except signing.BadSignature:
+        raise _invalid_activation_error()
+    user = User.objects.filter(
+        id=payload["uid"], status=UserStatus.PENDING_APPROVAL, deleted_at__isnull=True
+    ).first()
+    if user is None:
+        raise _invalid_activation_error()
+    return user
+
+
 def verify_otp(user, purpose: str, code: str) -> OTPCode:
     """Validate and consume the active code. Raises ApiError on any failure."""
     otp = (
